@@ -1,2 +1,0 @@
-# CUZone
-Project 2
