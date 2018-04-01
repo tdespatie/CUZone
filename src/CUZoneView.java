@@ -73,7 +73,13 @@ public class CUZoneView extends JPanel {
 
         //This is reading the image from the 'image' directory.
         try {
-            Image img = ImageIO.read(getClass().getResource(file.toString().substring(4)));
+            String fileLocation;
+            if (file.toString().contains("src"))
+                fileLocation = file.toString().substring(4);
+            else
+                fileLocation = file.toString();
+            Image img = ImageIO.read(getClass().getResource(fileLocation));
+
             button.setIcon(new ImageIcon(img));
         } catch (Exception ex) {
             System.out.println(ex);
