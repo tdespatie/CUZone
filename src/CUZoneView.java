@@ -4,16 +4,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Random;
 
 
 public class CUZoneView extends JPanel {
+    private File[] fileList;
     private ActionListener handler = new Controller();
     private JPanel testPanel = new JPanel();
     private JPanel mainScreen = new JPanel();
+    private JPanel passwordPanel = new JPanel();
 
     public CUZoneView() {
         setSize(400,200);
@@ -93,33 +94,22 @@ public class CUZoneView extends JPanel {
      */
     private void createTestPanel (String password) {
         // Test Panel
-        JPanel testPanel = new JPanel();
+        testPanel = new JPanel();
         testPanel.setLayout(new BorderLayout());
 
         // Display the random password to the user, make sure they can't edit it
         JTextArea passwordLabel = new JTextArea("Your password is: " + password);
+        JButton nextBtn = new JButton("Next");
+        nextBtn.setActionCommand("Next");
+        nextBtn.addActionListener(handler);
+
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
 
-        JPanel passwordPanel = new JPanel(); // This is the panel responsible for displaying the shapes
-        passwordPanel.setLayout(new GridLayout(4,2));
 
-        Path currentRelativePath = Paths.get("");
-        String s = currentRelativePath.toAbsolutePath().toString();
-
-        File directory;
-        if (!s.endsWith("src")) {
-            directory = new File("src"); // Source directory of the shape
-        } else
-            directory = new File("."); // Source directory of the shape
-
-        final File[] fileList = directory.listFiles((d, name) -> name.endsWith(".PNG"));
-
-        // Iterate through each file in the directory to find all the shapes
-        for (final File file : fileList)
-            passwordPanel.add(createButton(file.getName(), file, handler)); // Create a button per shape
 
         passwordPanel.setVisible(true);
+        testPanel.add(nextBtn, BorderLayout.SOUTH);
         testPanel.add(passwordPanel, BorderLayout.CENTER); // Add the shape panel to the center of the Test panel
         testPanel.add(passwordLabel, BorderLayout.NORTH); // Add the provided the password to the top of the panel
         testPanel.setVisible(true);
@@ -127,6 +117,16 @@ public class CUZoneView extends JPanel {
         mainScreen.setVisible(false); // Make the main menu not visible
         this.add(testPanel); // Add the test panel to the Main Panel
         this.revalidate(); // Revalidate (A.K.A Reload the panel)
+    }
+
+    private void randomizeShapePanel(File[] fileList) {
+        passwordPanel = new JPanel();
+        passwordPanel.setLayout(new GridLayout(4,2));
+
+        // Iterate through each file in the directory to find all the shapes
+        for (final File file : fileList)
+            passwordPanel.add(createButton(file.getName(), file, handler)); // Create a button per shape
+
     }
 
     private class Controller implements ActionListener {
@@ -143,8 +143,12 @@ public class CUZoneView extends JPanel {
                 String[] emailPassword = model.getEmailPassword(); // Get the created password
                 String strEmailPassword = ""; // Turn the password from an array to a string
                 for (String i : emailPassword)
-                    strEmailPassword += i + ", "; // I know...this leaves an extra comma
+                    strEmailPassword += i + " "; // I know...this leaves an extra comma
+
+                randomizeShapePanel(model.randomizeFileList());
                 createTestPanel(strEmailPassword); // Call the function to display the Test Panel for user input
+            } else {
+                System.out.println(str);
             }
 
         }

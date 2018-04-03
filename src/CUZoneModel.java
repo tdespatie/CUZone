@@ -1,7 +1,11 @@
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 @SuppressWarnings("Duplicates")
 public class CUZoneModel {
     private String[] Shapes = {"Circle", "Diamond", "Oval", "Parallelogram", "Pentagon", "Rectangle", "Square", "Triangle"};
+    private File[]  fileList;
 
     private Boolean emailPasswordSet;
     private String[] emailPassword;
@@ -12,12 +16,46 @@ public class CUZoneModel {
     private Boolean bankingPasswordSet;
     private String[] bankingPassword;
 
+    private String nextExpectedShape;
+
     public CUZoneModel () {
         emailPasswordSet = false;
         shoppingPasswordSet = false;
         bankingPasswordSet = false;
+
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+
+        File directory;
+        if (!s.endsWith("src")) {
+            directory = new File("src"); // Source directory of the shape
+        } else
+            directory = new File("."); // Source directory of the shape
+
+        fileList = directory.listFiles((d, name) -> name.endsWith(".PNG"));
     }
 
+    public File[] getFileList() {
+        return fileList;
+    }
+
+    public String getNextExpectedShape() {
+        return nextExpectedShape;
+    }
+
+    public File[] randomizeFileList() {
+        int index;
+        File temp;
+        Random random = new Random();
+        for (int i = fileList.length - 1; i > 0; i--)
+        {
+            index = random.nextInt(i + 1);
+            temp = fileList[index];
+            fileList[index] = fileList[i];
+            fileList[i] = temp;
+        }
+        return fileList;
+    }
 
     public String[] getEmailPassword() {
         if (emailPasswordSet)
