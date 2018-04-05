@@ -112,6 +112,22 @@ public class CUZoneModel {
         bankingPasswordSet = true;
     }
 
+    public int getNumOfSuccesses() {
+        return numOfSuccesses;
+    }
+
+    public void incNumOfSuccesses() {
+        numOfSuccesses++;
+    }
+
+    public int getNumberOfFailures() {
+        return numberOfFailures;
+    }
+
+    public void incNumberOfFailures() {
+        numberOfFailures++;
+    }
+
     /* This is how many screens we will iterate through (Max is 7, Min 5)  */
     private int getRandomLength() {
         Random rand = new Random();

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class CUZoneView extends JPanel {
@@ -63,11 +65,17 @@ public class CUZoneView extends JPanel {
 
         logText.setText("=========================== LOG FILE ============================\n");
         logText.setEditable(false);
+        JButton saveLogText = new JButton("Save Log");
+        saveLogText.setActionCommand("Save");
+        saveLogText.addActionListener(handler);
+
+        logPanel.setLayout(new BorderLayout());
         logPanel.add(logText, BorderLayout.CENTER);
+        logPanel.add(saveLogText, BorderLayout.SOUTH);
         logPanel.setVisible(true);
 
         mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
-        mainScreen.add(logText, BorderLayout.CENTER);
+        mainScreen.add(logPanel, BorderLayout.CENTER);
         mainScreen.setVisible(true);
 
         add(mainScreen, BorderLayout.CENTER);
@@ -137,6 +145,11 @@ public class CUZoneView extends JPanel {
 
     }
 
+    private void writeToLog(String message) {
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd - HH:mm:ss").format(new Date());
+        logText.append(timeStamp + ": " + message + "\n");
+    }
+
     private class Controller implements ActionListener {
         final CUZoneModel model = new CUZoneModel();
 
@@ -145,7 +158,7 @@ public class CUZoneView extends JPanel {
             String str = e.getActionCommand();
 
             if (str.equals("Email")) {
-                logText.append("***LOG: Email password has been created.***\n");
+                writeToLog("Email password has been created.");
                 model.setEmailPassword(); // Create a random shape password
 
                 String[] emailPassword = model.getEmailPassword(); // Get the created password
@@ -159,15 +172,23 @@ public class CUZoneView extends JPanel {
             } else { // Shape must've been clicked
                 if (str.contains(".PNG")) {
                     str = str.replace(".PNG", "").toLowerCase();
-                    logText.append("LOG: " + str + " has been selected.\n");
+                    writeToLog(str + " has been selected.");
 
 
                     if (!str.equals(model.getNextExpectedShape())) {
-                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape! " + model.getNextExpectedShape());
-                        logText.append("***LOG: User has entered an invalid shape!***\n");
+                        model.incNumberOfFailures();
+                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape!");
+                        writeToLog("User has entered an invalid shape! Number of failures: " + model.getNumberOfFailures());
+                        if (model.getNumberOfFailures() >= 3) {
+                            writeToLog("User has failed 3 times. Click \"Save Log\" below.");
+                            testPanel.setVisible(false);
+                            mainControlsPanel.setVisible(false);
+                            mainScreen.setVisible(true);
+
+                        }
                     } else {
                         if (!model.setNextExpectedShape()) {
-                            logText.append("***LOG: User has been properly authenticated!***\n");
+                            writeToLog("User has been properly authenticated!");
                             testPanel.setVisible(false);
                             mainScreen.setVisible(true);
                             return;
