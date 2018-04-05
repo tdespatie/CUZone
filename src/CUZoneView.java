@@ -196,6 +196,23 @@ public class CUZoneView extends JPanel {
                 randomizeShapePanel(model.randomizeFileList());
                 createTestPanel(strBankingPassword); // Call the function to display the Test Panel for user input
                 model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
+            } else if (str.equals("Test")) {
+                writeToLog("Testing passwords.");
+
+                int[] orderOfPassword = {0, 1, 2};
+                model.randomizeOrder(orderOfPassword); // Randomize order the user will be tested
+
+                for (int index : orderOfPassword) {
+                    model.setNumberOfFailures(0); // TODO: figure out if this is needed here.
+                    randomizeShapePanel(model.randomizeFileList());
+                    switch (index) {
+                        case 0: break; // Email
+                        case 1: break; // Shopping
+                        case 2: break; // Banking
+                    }
+                }
+
+
             } else { // Shape must've been clicked
                 if (str.contains(".PNG")) {
                     str = str.replace(".PNG", "").toLowerCase();
@@ -215,6 +232,7 @@ public class CUZoneView extends JPanel {
                     } else {
                         if (!model.setNextExpectedShape()) {
                             writeToLog("User has been properly authenticated!");
+                            model.setNumberOfFailures(0);
                             model.incNumOfSuccesses();
                             switch (model.getNumOfSuccesses()) {
                                 case 1: shopBtn.setEnabled(true);

@@ -5,6 +5,7 @@ import java.util.Random;
 
 @SuppressWarnings("Duplicates")
 public class CUZoneModel {
+    private Random random = new Random();
     private String[] Shapes = {"circle", "diamond", "oval", "parallelogram", "pentagon", "rectangle", "square", "triangle"};
     private File[] fileList;
 
@@ -61,10 +62,9 @@ public class CUZoneModel {
         setNextExpectedShape();
     }
 
-    public File[] randomizeFileList() {
+    public File[] randomizeFileList() { // Refactor this
         int index;
         File temp;
-        Random random = new Random();
         for (int i = fileList.length - 1; i > 0; i--) {
             index = random.nextInt(i + 1);
             temp = fileList[index];
@@ -72,6 +72,18 @@ public class CUZoneModel {
             fileList[i] = temp;
         }
         return fileList;
+    }
+
+    public int[] randomizeOrder(int[] list) {
+        int index;
+        int temp;
+        for (int i = list.length - 1; i > 0; i--) {
+            index = random.nextInt(i + 1);
+            temp = list[index];
+            list[index] = list[i];
+            list[i] = temp;
+        }
+        return list;
     }
 
     public String[] getEmailPassword() {
@@ -129,18 +141,24 @@ public class CUZoneModel {
         numberOfFailures++;
     }
 
+    public void setNumberOfFailures(int num) {
+        numberOfFailures = num;
+    }
+
+    public int getRandomNumber(int max) {
+        return random.nextInt(max);
+    }
+
     /* This is how many screens we will iterate through (Max is 7, Min 5)  */
     private int getRandomLength() {
-        Random rand = new Random();
-        return rand.nextInt(4) + 4;
+        return random.nextInt(4) + 4;
     }
 
     /* This is generating a random number of shape combinations for a given password length */
     private String[] getRandomPassword(int numOfShapes) {
-        Random rand = new Random();
         String[] randomPassword = new String[numOfShapes];
         for (int i = 0; i < numOfShapes; i++)
-            randomPassword[i] = Shapes[rand.nextInt(7)];
+            randomPassword[i] = Shapes[random.nextInt(7)];
         return randomPassword;
     }
 
