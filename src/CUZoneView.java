@@ -4,23 +4,27 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Random;
 
 
 public class CUZoneView extends JPanel {
     private File[] fileList;
     private ActionListener handler = new Controller();
-    private JPanel testPanel = new JPanel();
+
     private JPanel mainScreen = new JPanel();
+    private JPanel mainControlsPanel = new JPanel();
+    private JPanel logPanel = new JPanel();
+    private JTextArea logText = new JTextArea();
+
+    private JPanel testPanel = new JPanel();
     private JPanel passwordPanel = new JPanel();
+
 
     public CUZoneView() {
         setSize(400,200);
-        //setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
-        mainScreen.setLayout(new GridLayout(4,2));
+        mainScreen.setLayout(new BorderLayout());
+        mainControlsPanel.setLayout(new GridLayout(4,2));
 
         JLabel emailLabel = new JLabel("Email:");
         JButton buttonCreate = new JButton("Create Password");
@@ -39,24 +43,34 @@ public class CUZoneView extends JPanel {
         bankBtn.addActionListener(handler);
         bankBtn.setEnabled(false);
 
-        mainScreen.add(emailLabel);
-        mainScreen.add(buttonCreate);
-        mainScreen.add(shopLabel);
-        mainScreen.add(shopBtn);
-        mainScreen.add(bankLabel);
-        mainScreen.add(bankBtn);
-
         JLabel testLabel = new JLabel("Test Your Memory");
         JButton testButton = new JButton("Launch Test");
         testButton.setActionCommand("Test");
         testButton.addActionListener(handler);
         testButton.setEnabled(false);
 
-        mainScreen.add(testLabel);
-        mainScreen.add(testButton);
+        mainControlsPanel.add(emailLabel);
+        mainControlsPanel.add(buttonCreate);
+        mainControlsPanel.add(shopLabel);
+        mainControlsPanel.add(shopBtn);
+        mainControlsPanel.add(bankLabel);
+        mainControlsPanel.add(bankBtn);
+        mainControlsPanel.add(testLabel);
+        mainControlsPanel.add(testButton);
+        mainControlsPanel.setVisible(true);
 
-        add(mainScreen);
+        mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
 
+        logText.setText("=========================== LOG FILE ============================\n");
+        logText.setEditable(false);
+        logPanel.add(logText, BorderLayout.CENTER);
+        logPanel.setVisible(true);
+
+        mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
+        mainScreen.add(logText, BorderLayout.CENTER);
+        mainScreen.setVisible(true);
+
+        add(mainScreen, BorderLayout.CENTER);
         setVisible(true);
 
     }
@@ -99,22 +113,16 @@ public class CUZoneView extends JPanel {
 
         // Display the random password to the user, make sure they can't edit it
         JTextArea passwordLabel = new JTextArea("Your password is: " + password);
-        JButton nextBtn = new JButton("Next");
-        nextBtn.setActionCommand("Next");
-        nextBtn.addActionListener(handler);
 
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
 
-
-
         passwordPanel.setVisible(true);
-        testPanel.add(nextBtn, BorderLayout.SOUTH);
         testPanel.add(passwordPanel, BorderLayout.CENTER); // Add the shape panel to the center of the Test panel
         testPanel.add(passwordLabel, BorderLayout.NORTH); // Add the provided the password to the top of the panel
         testPanel.setVisible(true);
-
         mainScreen.setVisible(false); // Make the main menu not visible
+
         this.add(testPanel); // Add the test panel to the Main Panel
         this.revalidate(); // Revalidate (A.K.A Reload the panel)
     }
@@ -137,7 +145,7 @@ public class CUZoneView extends JPanel {
             String str = e.getActionCommand();
 
             if (str.equals("Email")) {
-                System.out.println("Email: Create Password!");
+                logText.append("***LOG: Email password has been created.***\n");
                 model.setEmailPassword(); // Create a random shape password
 
                 String[] emailPassword = model.getEmailPassword(); // Get the created password
@@ -147,8 +155,30 @@ public class CUZoneView extends JPanel {
 
                 randomizeShapePanel(model.randomizeFileList());
                 createTestPanel(strEmailPassword); // Call the function to display the Test Panel for user input
-            } else {
-                System.out.println(str);
+                model.setCurrentPassword(emailPassword); // Sets the expected Password for user to test input
+            } else { // Shape must've been clicked
+                if (str.contains(".PNG")) {
+                    str = str.replace(".PNG", "").toLowerCase();
+                    logText.append("LOG: " + str + " has been selected.\n");
+
+
+                    if (!str.equals(model.getNextExpectedShape())) {
+                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape! " + model.getNextExpectedShape());
+                        logText.append("***LOG: User has entered an invalid shape!***\n");
+                    } else {
+                        if (!model.setNextExpectedShape()) {
+                            logText.append("***LOG: User has been properly authenticated!***\n");
+                            testPanel.setVisible(false);
+                            mainScreen.setVisible(true);
+                            return;
+                        }
+                    }
+
+                    testPanel.remove(passwordPanel);
+                    randomizeShapePanel(model.randomizeFileList());
+                    testPanel.add(passwordPanel, BorderLayout.CENTER);
+                    testPanel.revalidate();
+                }
             }
 
         }
