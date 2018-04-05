@@ -8,10 +8,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
-
 public class CUZoneView extends JPanel {
+
     private File[] fileList;
     private ActionListener handler = new Controller();
 
@@ -25,11 +27,19 @@ public class CUZoneView extends JPanel {
 
     private JPanel testPanel = new JPanel();
     private JPanel passwordPanel = new JPanel();
+    private JTextArea passwordLabel = new JTextArea();
 
+    private ArrayList<Integer> orderOfPassword = new ArrayList<Integer>();
+    private boolean randomized = false;
 
     public CUZoneView() {
         setSize(400,200);
         setLayout(new BorderLayout());
+
+        orderOfPassword.add(0);
+        orderOfPassword.add(1);
+        orderOfPassword.add(2);
+        Collections.shuffle(orderOfPassword);
 
         mainScreen.setLayout(new BorderLayout());
         mainControlsPanel.setLayout(new GridLayout(4,2));
@@ -71,6 +81,7 @@ public class CUZoneView extends JPanel {
 
         logText.setText("=========================== LOG FILE ============================\n");
         logText.setEditable(false);
+        
         JButton saveLogText = new JButton("Save Log");
         saveLogText.setActionCommand("Save");
         saveLogText.addActionListener(handler);
@@ -126,14 +137,13 @@ public class CUZoneView extends JPanel {
         testPanel.setLayout(new BorderLayout());
 
         // Display the random password to the user, make sure they can't edit it
-        JTextArea passwordLabel = new JTextArea("Your password is: " + password);
+        if (password != null) passwordLabel.setText("Your password is: " + password);
 
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
-
         passwordPanel.setVisible(true);
-        testPanel.add(passwordPanel, BorderLayout.CENTER); // Add the shape panel to the center of the Test panel
         testPanel.add(passwordLabel, BorderLayout.NORTH); // Add the provided the password to the top of the panel
+        testPanel.add(passwordPanel, BorderLayout.CENTER); // Add the shape panel to the center of the Test panel
         testPanel.setVisible(true);
         mainScreen.setVisible(false); // Make the main menu not visible
 
@@ -154,6 +164,7 @@ public class CUZoneView extends JPanel {
     private void writeToLog(String message) {
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd - HH:mm:ss").format(new Date());
         logText.append(timeStamp + ": " + message + "\n");
+        logText.setCaretPosition(logText.getDocument().getLength());
     }
 
     private void saveToFile() {
@@ -187,6 +198,10 @@ public class CUZoneView extends JPanel {
         }
         writeToLog("Log was written to " + file.getAbsolutePath());
         JOptionPane.showMessageDialog(this,"Log was written to " + file.getAbsolutePath());
+    }
+
+    private void getNextTest() {
+
     }
 
     private class Controller implements ActionListener {
@@ -233,24 +248,39 @@ public class CUZoneView extends JPanel {
                 createTestPanel(strBankingPassword); // Call the function to display the Test Panel for user input
                 model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
             } else if (str.equals("Test")) {
-                writeToLog("Testing passwords.");
 
-                int[] orderOfPassword = {0, 1, 2};
-                model.randomizeOrder(orderOfPassword); // Randomize order the user will be tested
+                writeToLog("Testing passwords. You must click the test button until all tests are completed.");
+                emailBtn.setEnabled(false);
+                shopBtn.setEnabled(false);
+                bankBtn.setEnabled(false);
 
-                for (int index : orderOfPassword) {
+                if (orderOfPassword.size() > 0) {
                     model.setNumberOfFailures(0); // TODO: figure out if this is needed here.
                     randomizeShapePanel(model.randomizeFileList());
-                    switch (index) {
+                    createTestPanel(null);
+                    switch (orderOfPassword.get(0)) {
                         case 0:
+                            writeToLog("Randomized test - Email password.");
+                            model.setCurrentPassword(model.getEmailPassword());
+                            passwordLabel.setText("Please enter the Email password.");
                             break; // Email
                         case 1:
+                            writeToLog("Randomized test - Shopping password.");
+                            model.setCurrentPassword(model.getShoppingPassword());
+                            passwordLabel.setText("Please enter the Shopping password.");
                             break; // Shopping
                         case 2:
+                            writeToLog("Randomized test - Banking password.");
+                            model.setCurrentPassword(model.getBankingPassword());
+                            passwordLabel.setText("Please enter the Banking password.");
                             break; // Banking
                     }
+                    orderOfPassword.remove(0);
+                    if (orderOfPassword.size() == 0) {
+                        mainControlsPanel.setVisible(false);
+                        writeToLog("All tests completed!");
+                    }
                 }
-
             } else if (str.equals("Save")) {
                 saveToFile();
             } else { // Shape must've been clicked
@@ -261,7 +291,7 @@ public class CUZoneView extends JPanel {
 
                     if (!str.equals(model.getNextExpectedShape())) {
                         model.incNumberOfFailures();
-                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape!");
+                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape! You have " + (3 - model.getNumberOfFailures()) + " tries remaining.");
                         writeToLog("User has entered an invalid shape! Number of failures: " + model.getNumberOfFailures());
                         if (model.getNumberOfFailures() >= 3) {
                             writeToLog("User has failed 3 times. Click \"Save Log\" below.");
