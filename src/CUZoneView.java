@@ -13,7 +13,10 @@ public class CUZoneView extends JPanel {
     private ActionListener handler = new Controller();
 
     private JPanel mainScreen = new JPanel();
+
     private JPanel mainControlsPanel = new JPanel();
+    private JButton emailBtn, shopBtn, bankBtn, testBtn;
+
     private JPanel logPanel = new JPanel();
     private JTextArea logText = new JTextArea();
 
@@ -29,36 +32,36 @@ public class CUZoneView extends JPanel {
         mainControlsPanel.setLayout(new GridLayout(4,2));
 
         JLabel emailLabel = new JLabel("Email:");
-        JButton buttonCreate = new JButton("Create Password");
-        buttonCreate.setActionCommand("Email");
-        buttonCreate.addActionListener(handler);
+        emailBtn = new JButton("Create Password");
+        emailBtn.setActionCommand("Email");
+        emailBtn.addActionListener(handler);
 
         JLabel shopLabel = new JLabel("Shopping:");
-        JButton shopBtn = new JButton("Create Password");
+        shopBtn = new JButton("Create Password");
         shopBtn.setActionCommand("Shopping");
         shopBtn.addActionListener(handler);
         shopBtn.setEnabled(false);
 
         JLabel bankLabel = new JLabel("Banking:");
-        JButton bankBtn = new JButton("Create Password");
+        bankBtn = new JButton("Create Password");
         bankBtn.setActionCommand("Banking");
         bankBtn.addActionListener(handler);
         bankBtn.setEnabled(false);
 
         JLabel testLabel = new JLabel("Test Your Memory");
-        JButton testButton = new JButton("Launch Test");
-        testButton.setActionCommand("Test");
-        testButton.addActionListener(handler);
-        testButton.setEnabled(false);
+        testBtn = new JButton("Launch Test");
+        testBtn.setActionCommand("Test");
+        testBtn.addActionListener(handler);
+        testBtn.setEnabled(false);
 
         mainControlsPanel.add(emailLabel);
-        mainControlsPanel.add(buttonCreate);
+        mainControlsPanel.add(emailBtn);
         mainControlsPanel.add(shopLabel);
         mainControlsPanel.add(shopBtn);
         mainControlsPanel.add(bankLabel);
         mainControlsPanel.add(bankBtn);
         mainControlsPanel.add(testLabel);
-        mainControlsPanel.add(testButton);
+        mainControlsPanel.add(testBtn);
         mainControlsPanel.setVisible(true);
 
         mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
@@ -164,11 +167,35 @@ public class CUZoneView extends JPanel {
                 String[] emailPassword = model.getEmailPassword(); // Get the created password
                 String strEmailPassword = ""; // Turn the password from an array to a string
                 for (String i : emailPassword)
-                    strEmailPassword += i + " "; // I know...this leaves an extra comma
+                    strEmailPassword += i + " ";
 
                 randomizeShapePanel(model.randomizeFileList());
                 createTestPanel(strEmailPassword); // Call the function to display the Test Panel for user input
                 model.setCurrentPassword(emailPassword); // Sets the expected Password for user to test input
+            } else if (str.equals("Shopping")) {
+                writeToLog("Shopping password has been created.");
+                model.setShoppingPassword(); // Create a random shape password
+
+                String[] shoppingPassword = model.getShoppingPassword(); // Get the created password
+                String strShoppingPassword = ""; // Turn the password from an array to a string
+                for (String i : shoppingPassword)
+                    strShoppingPassword += i + " ";
+
+                randomizeShapePanel(model.randomizeFileList());
+                createTestPanel(strShoppingPassword); // Call the function to display the Test Panel for user input
+                model.setCurrentPassword(shoppingPassword); // Sets the expected Password for user to test input
+            } else if (str.equals("Banking")) {
+                writeToLog("Banking password has been created.");
+                model.setBankingPassword(); // Create a random shape password
+
+                String[] bankingPassword = model.getBankingPassword(); // Get the created password
+                String strBankingPassword = ""; // Turn the password from an array to a string
+                for (String i : bankingPassword)
+                    strBankingPassword += i + " ";
+
+                randomizeShapePanel(model.randomizeFileList());
+                createTestPanel(strBankingPassword); // Call the function to display the Test Panel for user input
+                model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
             } else { // Shape must've been clicked
                 if (str.contains(".PNG")) {
                     str = str.replace(".PNG", "").toLowerCase();
@@ -184,11 +211,19 @@ public class CUZoneView extends JPanel {
                             testPanel.setVisible(false);
                             mainControlsPanel.setVisible(false);
                             mainScreen.setVisible(true);
-
                         }
                     } else {
                         if (!model.setNextExpectedShape()) {
                             writeToLog("User has been properly authenticated!");
+                            model.incNumOfSuccesses();
+                            switch (model.getNumOfSuccesses()) {
+                                case 1: shopBtn.setEnabled(true);
+                                        break;
+                                case 2: bankBtn.setEnabled(true);
+                                        break;
+                                case 3: testBtn.setEnabled(true);
+                                        break;
+                            }
                             testPanel.setVisible(false);
                             mainScreen.setVisible(true);
                             return;

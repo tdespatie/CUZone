@@ -57,6 +57,7 @@ public class CUZoneModel {
 
     public void setCurrentPassword(String[] password) {
         currentPassword = password;
+        currentShapeIndex = 0;
         setNextExpectedShape();
     }
 
