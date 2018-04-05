@@ -3,7 +3,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -153,6 +156,39 @@ public class CUZoneView extends JPanel {
         logText.append(timeStamp + ": " + message + "\n");
     }
 
+    private void saveToFile() {
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setApproveButtonText("Save");
+        int actionDialog = fileChooser.showSaveDialog(this);
+        if (actionDialog != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = fileChooser.getSelectedFile();
+        if (!file.getName().endsWith(".txt")) {
+            file = new File(file.getAbsolutePath() + ".txt");
+        }
+
+        BufferedWriter outFile = null;
+        try {
+            outFile = new BufferedWriter(new FileWriter(file));
+            logText.write(outFile);
+        } catch (IOException e) {
+            writeToLog("Failed to save log to file.");
+            e.printStackTrace();
+        } finally {
+            if (outFile != null) {
+                try {
+                    outFile.close();
+                } catch (IOException ex) {
+                    writeToLog("Failed to save log to file.");
+                }
+            }
+        }
+        writeToLog("Log was written to " + file.getAbsolutePath());
+        JOptionPane.showMessageDialog(this,"Log was written to " + file.getAbsolutePath());
+    }
+
     private class Controller implements ActionListener {
         final CUZoneModel model = new CUZoneModel();
 
@@ -206,13 +242,17 @@ public class CUZoneView extends JPanel {
                     model.setNumberOfFailures(0); // TODO: figure out if this is needed here.
                     randomizeShapePanel(model.randomizeFileList());
                     switch (index) {
-                        case 0: break; // Email
-                        case 1: break; // Shopping
-                        case 2: break; // Banking
+                        case 0:
+                            break; // Email
+                        case 1:
+                            break; // Shopping
+                        case 2:
+                            break; // Banking
                     }
                 }
 
-
+            } else if (str.equals("Save")) {
+                saveToFile();
             } else { // Shape must've been clicked
                 if (str.contains(".PNG")) {
                     str = str.replace(".PNG", "").toLowerCase();
