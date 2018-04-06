@@ -23,6 +23,7 @@ class CUZoneModel {
 
     private int numberOfFailures;
 
+    /* Constructor for the model (All program's data) */
     CUZoneModel() {
         emailPasswordSet = shoppingPasswordSet = bankingPasswordSet = false;
         numberOfFailures = currentShapeIndex = 0;
@@ -39,10 +40,12 @@ class CUZoneModel {
         fileList = directory.listFiles((d, name) -> name.endsWith(".PNG"));
     }
 
+    /* Function returns what shape should be clicked next */
     String getNextExpectedShape() {
         return nextExpectedShape;
     }
 
+    /* Function sets what shape should be clicked next */
     boolean setNextExpectedShape() {
         String[] current_Password = getCurrentPassword();
 
@@ -67,13 +70,13 @@ class CUZoneModel {
         return currentPassword;
     }
 
-    void setCurrentPassword(String[] password) {
+    void setCurrentPassword(String[] password) { // Sets what password we expect
         currentPassword = password;
         currentShapeIndex = 0;
         setNextExpectedShape();
     }
 
-    File[] randomizeFileList() { // Refactor this
+    File[] randomizeFileList() {
         int index;
         File temp;
         for (int i = fileList.length - 1; i > 0; i--) {
@@ -103,21 +106,21 @@ class CUZoneModel {
         return null;
     }
 
-    void setEmailPassword() {
+    void setEmailPassword() { // Sets the email password
         int length = getRandomLength();
         emailPassword = new String[length];
         emailPassword = getRandomPassword(length);
         emailPasswordSet = true;
     }
 
-    void setShoppingPassword() {
+    void setShoppingPassword() { // Sets the shopping password
         int length = getRandomLength();
         shoppingPassword = new String[length];
         shoppingPassword = getRandomPassword(length);
         shoppingPasswordSet = true;
     }
 
-    void setBankingPassword() {
+    void setBankingPassword() { // Sets the banking password
         int length = getRandomLength();
         bankingPassword = new String[length];
         bankingPassword = getRandomPassword(length);

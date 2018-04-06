@@ -8,6 +8,7 @@ import javax.swing.*;
 
 public class CUZone extends JFrame {
 
+    /* This function creates the JFrame (Application interface) */
     public static void main(String[] string) {
         javax.swing.SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame();

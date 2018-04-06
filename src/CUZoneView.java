@@ -40,6 +40,7 @@ class CUZoneView extends JPanel {
 
     private ArrayList<Integer> orderOfPassword = new ArrayList<>();
 
+    /* Functions sets up the Main display panel with components and additional Panes */
     CUZoneView() {
         setSize(400,200);
         setLayout(new BorderLayout());
@@ -154,7 +155,7 @@ class CUZoneView extends JPanel {
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
         passwordPanel.setVisible(true);
-        
+
         backBtn.setActionCommand("Back");
         backBtn.addActionListener(handler);
 
@@ -168,6 +169,7 @@ class CUZoneView extends JPanel {
         this.revalidate(); // Revalidate (A.K.A Reload the panel)
     }
 
+    /* This function randomizes what shapes are located where per screen */
     private void randomizeShapePanel(File[] fileList) {
         passwordPanel = new JPanel();
         passwordPanel.setLayout(new GridLayout(4,2));
@@ -178,12 +180,14 @@ class CUZoneView extends JPanel {
 
     }
 
+    /* This function writes a message to the log with a timestamp */
     private void writeToLog(String message) {
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd - HH:mm:ss").format(new Date());
         logText.append(timeStamp + ": " + message + "\n");
         logText.setCaretPosition(logText.getDocument().getLength());
     }
 
+    /* This function saves the log to a file */
     private void saveToFile() {
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setApproveButtonText("Save");
@@ -217,7 +221,7 @@ class CUZoneView extends JPanel {
         JOptionPane.showMessageDialog(this,"Log was written to " + file.getAbsolutePath());
     }
 
-
+    /* This is the controller class that listens to each component for interaction */
     private class Controller implements ActionListener {
         final CUZoneModel model = new CUZoneModel();
 
@@ -226,7 +230,7 @@ class CUZoneView extends JPanel {
             String str = e.getActionCommand();
 
             switch (str) {
-                case "Email":
+                case "Email": // Email button has been clicked
                     writeToLog("Email password has been created.");
                     model.setEmailPassword(); // Create a random shape password
 
@@ -243,7 +247,7 @@ class CUZoneView extends JPanel {
                     model.setCurrentPassword(emailPassword); // Sets the expected Password for user to test input
 
                     break;
-                case "Shopping":
+                case "Shopping": // Shopping button has been clicked
                     writeToLog("Shopping password has been created.");
                     model.setShoppingPassword(); // Create a random shape password
 
@@ -260,7 +264,7 @@ class CUZoneView extends JPanel {
                     model.setCurrentPassword(shoppingPassword); // Sets the expected Password for user to test input
 
                     break;
-                case "Banking":
+                case "Banking": // Banking button has been clicked
                     writeToLog("Banking password has been created.");
                     model.setBankingPassword(); // Create a random shape password
 
@@ -275,7 +279,7 @@ class CUZoneView extends JPanel {
                     createTestPanel(strBankingPassword.toString()); // Call the function to display the Test Panel for user input
                     model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
                     break;
-                case "Test":
+                case "Test": // Test button has been clicked
                     writeToLog("Testing passwords. You must click the test button until all tests are completed.");
                     emailBtn.setEnabled(false);
                     shopBtn.setEnabled(false);
@@ -310,10 +314,10 @@ class CUZoneView extends JPanel {
                         }
                     }
                     break;
-                case "Save":
+                case "Save": // Save button has been clicked
                     saveToFile();
                     break;
-                case "Back":
+                case "Back": // Back button has been clicked
                     writeToLog("User has chosen to return to main menu.");
                     testPanel.setVisible(false);
                     mainControlsPanel.setVisible(true);
@@ -362,7 +366,6 @@ class CUZoneView extends JPanel {
                     }
                     break;
             }
-
         }
     }
 }
