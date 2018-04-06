@@ -100,6 +100,7 @@ class CUZoneView extends JPanel {
         logPanel.add(scrollPane, BorderLayout.CENTER);
         logPanel.add(saveLogText, BorderLayout.SOUTH);
         logPanel.setVisible(true);
+        writeToLog("Application started.");
 
         mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
         mainScreen.add(logPanel, BorderLayout.CENTER);
