@@ -79,15 +79,17 @@ public class CUZoneView extends JPanel {
 
         mainScreen.add(mainControlsPanel, BorderLayout.NORTH);
 
-        logText.setText("=========================== LOG FILE ============================\n");
+        JScrollPane scrollPane = new JScrollPane(logText);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        logText.setText("=========================== LOG FILE ===========================\n");
         logText.setEditable(false);
-        
+
         JButton saveLogText = new JButton("Save Log");
         saveLogText.setActionCommand("Save");
         saveLogText.addActionListener(handler);
 
         logPanel.setLayout(new BorderLayout());
-        logPanel.add(logText, BorderLayout.CENTER);
+        logPanel.add(scrollPane, BorderLayout.CENTER);
         logPanel.add(saveLogText, BorderLayout.SOUTH);
         logPanel.setVisible(true);
 
