@@ -30,6 +30,7 @@ class CUZoneView extends JPanel {
     private JButton shopBtn;
     private JButton bankBtn;
     private JButton testBtn;
+    private JButton backBtn;
 
     private JTextArea logText = new JTextArea();
 
@@ -154,7 +155,7 @@ class CUZoneView extends JPanel {
         passwordLabel.setLineWrap(true);
         passwordPanel.setVisible(true);
 
-        JButton backBtn = new JButton("Back");
+        backBtn = new JButton("Back");
         backBtn.setActionCommand("Back");
         backBtn.addActionListener(handler);
 
@@ -280,6 +281,7 @@ class CUZoneView extends JPanel {
                     emailBtn.setEnabled(false);
                     shopBtn.setEnabled(false);
                     bankBtn.setEnabled(false);
+                    backBtn.setEnabled(false);
 
                     if (orderOfPassword.size() > 0) {
                         model.resetNumberOfFailures(); // TODO: figure out if this is needed here.
