@@ -17,7 +17,7 @@ public class CUZoneModel {
 
     private int numberOfFailures, numOfSuccesses;
 
-    public CUZoneModel() {
+    CUZoneModel() {
         emailPasswordSet = shoppingPasswordSet = bankingPasswordSet = false;
         numberOfFailures = numOfSuccesses = currentShapeIndex = 0;
 
@@ -33,15 +33,11 @@ public class CUZoneModel {
         fileList = directory.listFiles((d, name) -> name.endsWith(".PNG"));
     }
 
-    public File[] getFileList() {
-        return fileList;
-    }
-
-    public String getNextExpectedShape() {
+    String getNextExpectedShape() {
         return nextExpectedShape;
     }
 
-    public boolean setNextExpectedShape() {
+    boolean setNextExpectedShape() {
         String[] current_Password = getCurrentPassword();
 
         if (current_Password.length > 0 && currentShapeIndex < current_Password.length) {
@@ -51,18 +47,27 @@ public class CUZoneModel {
 
         return false;
     }
+    boolean getEmailPasswordSet() {
+        return emailPasswordSet;
+    }
+    boolean getShopPasswordSet() {
+        return shoppingPasswordSet;
+    }
+    boolean getBankPasswordSet() {
+        return bankingPasswordSet;
+    }
 
-    public String[] getCurrentPassword() {
+    private String[] getCurrentPassword() {
         return currentPassword;
     }
 
-    public void setCurrentPassword(String[] password) {
+    void setCurrentPassword(String[] password) {
         currentPassword = password;
         currentShapeIndex = 0;
         setNextExpectedShape();
     }
 
-    public File[] randomizeFileList() { // Refactor this
+    File[] randomizeFileList() { // Refactor this
         int index;
         File temp;
         for (int i = fileList.length - 1; i > 0; i--) {
@@ -74,80 +79,63 @@ public class CUZoneModel {
         return fileList;
     }
 
-    public int[] randomizeOrder(int[] list) {
-        int index;
-        int temp;
-        for (int i = list.length - 1; i > 0; i--) {
-            index = random.nextInt(i + 1);
-            temp = list[index];
-            list[index] = list[i];
-            list[i] = temp;
-        }
-        return list;
-    }
-
-    public String[] getEmailPassword() {
+    String[] getEmailPassword() {
         if (emailPasswordSet)
             return emailPassword;
         return null;
     }
 
-    public String[] getShoppingPassword() {
+    String[] getShoppingPassword() {
         if (shoppingPasswordSet)
             return shoppingPassword;
         return null;
     }
 
-    public String[] getBankingPassword() {
+    String[] getBankingPassword() {
         if (bankingPasswordSet)
             return bankingPassword;
         return null;
     }
 
-    public void setEmailPassword() {
+    void setEmailPassword() {
         int length = getRandomLength();
         emailPassword = new String[length];
         emailPassword = getRandomPassword(length);
         emailPasswordSet = true;
     }
 
-    public void setShoppingPassword() {
+    void setShoppingPassword() {
         int length = getRandomLength();
         shoppingPassword = new String[length];
         shoppingPassword = getRandomPassword(length);
         shoppingPasswordSet = true;
     }
 
-    public void setBankingPassword() {
+    void setBankingPassword() {
         int length = getRandomLength();
         bankingPassword = new String[length];
         bankingPassword = getRandomPassword(length);
         bankingPasswordSet = true;
     }
 
-    public int getNumOfSuccesses() {
+    int getNumOfSuccesses() {
         return numOfSuccesses;
     }
 
-    public void incNumOfSuccesses() {
+    void incNumOfSuccesses() {
         numOfSuccesses++;
     }
 
-    public int getNumberOfFailures() {
+    int getNumberOfFailures() {
         return numberOfFailures;
     }
 
-    public void incNumberOfFailures() {
+    void incNumberOfFailures() {
         numberOfFailures++;
     }
 
-    public void setNumberOfFailures(int num) {
-        numberOfFailures = num;
-    }
+    void resetNumberOfFailures() { numberOfFailures = 0; }
 
-    public int getRandomNumber(int max) {
-        return random.nextInt(max);
-    }
 
     /* This is how many screens we will iterate through (Max is 7, Min 5)  */
     private int getRandomLength() {

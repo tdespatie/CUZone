@@ -1,3 +1,8 @@
+/*
+    Project:
+ */
+
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +25,7 @@ public class CUZoneView extends JPanel {
     private JPanel mainScreen = new JPanel();
 
     private JPanel mainControlsPanel = new JPanel();
-    private JButton emailBtn, shopBtn, bankBtn, testBtn;
+    private JButton emailBtn, shopBtn, bankBtn, testBtn, backBtn;
 
     private JPanel logPanel = new JPanel();
     private JTextArea logText = new JTextArea();
@@ -144,8 +149,14 @@ public class CUZoneView extends JPanel {
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
         passwordPanel.setVisible(true);
+
+        backBtn = new JButton("Back");
+        backBtn.setActionCommand("Back");
+        backBtn.addActionListener(handler);
+
         testPanel.add(passwordLabel, BorderLayout.NORTH); // Add the provided the password to the top of the panel
         testPanel.add(passwordPanel, BorderLayout.CENTER); // Add the shape panel to the center of the Test panel
+        testPanel.add(backBtn, BorderLayout.SOUTH);
         testPanel.setVisible(true);
         mainScreen.setVisible(false); // Make the main menu not visible
 
@@ -202,9 +213,6 @@ public class CUZoneView extends JPanel {
         JOptionPane.showMessageDialog(this,"Log was written to " + file.getAbsolutePath());
     }
 
-    private void getNextTest() {
-
-    }
 
     private class Controller implements ActionListener {
         final CUZoneModel model = new CUZoneModel();
@@ -257,7 +265,7 @@ public class CUZoneView extends JPanel {
                 bankBtn.setEnabled(false);
 
                 if (orderOfPassword.size() > 0) {
-                    model.setNumberOfFailures(0); // TODO: figure out if this is needed here.
+                    model.resetNumberOfFailures(); // TODO: figure out if this is needed here.
                     randomizeShapePanel(model.randomizeFileList());
                     createTestPanel(null);
                     switch (orderOfPassword.get(0)) {
@@ -285,11 +293,15 @@ public class CUZoneView extends JPanel {
                 }
             } else if (str.equals("Save")) {
                 saveToFile();
+            } else if (str.equals("Back")) {
+                writeToLog("User has chosen to return to main menu.");
+                testPanel.setVisible(false);
+                mainControlsPanel.setVisible(true);
+                mainScreen.setVisible(true);
             } else { // Shape must've been clicked
                 if (str.contains(".PNG")) {
                     str = str.replace(".PNG", "").toLowerCase();
                     writeToLog(str + " has been selected.");
-
 
                     if (!str.equals(model.getNextExpectedShape())) {
                         model.incNumberOfFailures();
@@ -304,16 +316,19 @@ public class CUZoneView extends JPanel {
                     } else {
                         if (!model.setNextExpectedShape()) {
                             writeToLog("User has been properly authenticated!");
-                            model.setNumberOfFailures(0);
+                            model.resetNumberOfFailures();
                             model.incNumOfSuccesses();
-                            switch (model.getNumOfSuccesses()) {
-                                case 1: shopBtn.setEnabled(true);
-                                        break;
-                                case 2: bankBtn.setEnabled(true);
-                                        break;
-                                case 3: testBtn.setEnabled(true);
-                                        break;
+
+                            if (model.getEmailPasswordSet()) {
+                                shopBtn.setEnabled(true);
                             }
+                            if (model.getShopPasswordSet()) {
+                                bankBtn.setEnabled(true);
+                            }
+                            if (model.getBankPasswordSet()) {
+                                testBtn.setEnabled(true);
+                            }
+
                             testPanel.setVisible(false);
                             mainScreen.setVisible(true);
                             return;
