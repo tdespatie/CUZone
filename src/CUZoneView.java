@@ -30,7 +30,7 @@ class CUZoneView extends JPanel {
     private JButton shopBtn;
     private JButton bankBtn;
     private JButton testBtn;
-    private JButton backBtn;
+    private JButton backBtn  = new JButton("Back");
 
     private JTextArea logText = new JTextArea();
 
@@ -154,8 +154,7 @@ class CUZoneView extends JPanel {
         passwordLabel.setEditable(false);
         passwordLabel.setLineWrap(true);
         passwordPanel.setVisible(true);
-
-        backBtn = new JButton("Back");
+        
         backBtn.setActionCommand("Back");
         backBtn.addActionListener(handler);
 
