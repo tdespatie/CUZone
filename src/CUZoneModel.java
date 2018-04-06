@@ -1,10 +1,16 @@
+/*
+    File: CUZoneModel.java
+    COMP 3008 - Project 2
+    Group: 11
+    Date Modified: April 6, 2018
+ */
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 
 @SuppressWarnings("Duplicates")
-public class CUZoneModel {
+class CUZoneModel {
     private Random random = new Random();
     private String[] Shapes = {"circle", "diamond", "oval", "parallelogram", "pentagon", "rectangle", "square", "triangle"};
     private File[] fileList;
@@ -15,11 +21,11 @@ public class CUZoneModel {
     private String nextExpectedShape;
     private int currentShapeIndex;
 
-    private int numberOfFailures, numOfSuccesses;
+    private int numberOfFailures;
 
     CUZoneModel() {
         emailPasswordSet = shoppingPasswordSet = bankingPasswordSet = false;
-        numberOfFailures = numOfSuccesses = currentShapeIndex = 0;
+        numberOfFailures = currentShapeIndex = 0;
 
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
@@ -116,14 +122,6 @@ public class CUZoneModel {
         bankingPassword = new String[length];
         bankingPassword = getRandomPassword(length);
         bankingPasswordSet = true;
-    }
-
-    int getNumOfSuccesses() {
-        return numOfSuccesses;
-    }
-
-    void incNumOfSuccesses() {
-        numOfSuccesses++;
     }
 
     int getNumberOfFailures() {

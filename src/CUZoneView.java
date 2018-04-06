@@ -1,7 +1,9 @@
 /*
-    Project:
+    File: CUZoneView.java
+    COMP 3008 - Project 2
+    Group: 11
+    Date Modified: April 6, 2018
  */
-
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,27 +19,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
-public class CUZoneView extends JPanel {
+class CUZoneView extends JPanel {
 
-    private File[] fileList;
     private ActionListener handler = new Controller();
 
     private JPanel mainScreen = new JPanel();
 
     private JPanel mainControlsPanel = new JPanel();
-    private JButton emailBtn, shopBtn, bankBtn, testBtn, backBtn;
+    private JButton emailBtn;
+    private JButton shopBtn;
+    private JButton bankBtn;
+    private JButton testBtn;
 
-    private JPanel logPanel = new JPanel();
     private JTextArea logText = new JTextArea();
 
     private JPanel testPanel = new JPanel();
     private JPanel passwordPanel = new JPanel();
     private JTextArea passwordLabel = new JTextArea();
 
-    private ArrayList<Integer> orderOfPassword = new ArrayList<Integer>();
-    private boolean randomized = false;
+    private ArrayList<Integer> orderOfPassword = new ArrayList<>();
 
-    public CUZoneView() {
+    CUZoneView() {
         setSize(400,200);
         setLayout(new BorderLayout());
 
@@ -93,6 +95,7 @@ public class CUZoneView extends JPanel {
         saveLogText.setActionCommand("Save");
         saveLogText.addActionListener(handler);
 
+        JPanel logPanel = new JPanel();
         logPanel.setLayout(new BorderLayout());
         logPanel.add(scrollPane, BorderLayout.CENTER);
         logPanel.add(saveLogText, BorderLayout.SOUTH);
@@ -150,7 +153,7 @@ public class CUZoneView extends JPanel {
         passwordLabel.setLineWrap(true);
         passwordPanel.setVisible(true);
 
-        backBtn = new JButton("Back");
+        JButton backBtn = new JButton("Back");
         backBtn.setActionCommand("Back");
         backBtn.addActionListener(handler);
 
@@ -221,125 +224,141 @@ public class CUZoneView extends JPanel {
         public void actionPerformed(ActionEvent e) {
             String str = e.getActionCommand();
 
-            if (str.equals("Email")) {
-                writeToLog("Email password has been created.");
-                model.setEmailPassword(); // Create a random shape password
+            switch (str) {
+                case "Email":
+                    writeToLog("Email password has been created.");
+                    model.setEmailPassword(); // Create a random shape password
 
-                String[] emailPassword = model.getEmailPassword(); // Get the created password
-                String strEmailPassword = ""; // Turn the password from an array to a string
-                for (String i : emailPassword)
-                    strEmailPassword += i + " ";
+                    String[] emailPassword = model.getEmailPassword(); // Get the created password
 
-                randomizeShapePanel(model.randomizeFileList());
-                createTestPanel(strEmailPassword); // Call the function to display the Test Panel for user input
-                model.setCurrentPassword(emailPassword); // Sets the expected Password for user to test input
-            } else if (str.equals("Shopping")) {
-                writeToLog("Shopping password has been created.");
-                model.setShoppingPassword(); // Create a random shape password
+                    StringBuilder strEmailPassword = new StringBuilder(); // Turn the password from an array to a string
 
-                String[] shoppingPassword = model.getShoppingPassword(); // Get the created password
-                String strShoppingPassword = ""; // Turn the password from an array to a string
-                for (String i : shoppingPassword)
-                    strShoppingPassword += i + " ";
+                    for (String i : emailPassword)
+                        strEmailPassword.append(i).append(" ");
 
-                randomizeShapePanel(model.randomizeFileList());
-                createTestPanel(strShoppingPassword); // Call the function to display the Test Panel for user input
-                model.setCurrentPassword(shoppingPassword); // Sets the expected Password for user to test input
-            } else if (str.equals("Banking")) {
-                writeToLog("Banking password has been created.");
-                model.setBankingPassword(); // Create a random shape password
-
-                String[] bankingPassword = model.getBankingPassword(); // Get the created password
-                String strBankingPassword = ""; // Turn the password from an array to a string
-                for (String i : bankingPassword)
-                    strBankingPassword += i + " ";
-
-                randomizeShapePanel(model.randomizeFileList());
-                createTestPanel(strBankingPassword); // Call the function to display the Test Panel for user input
-                model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
-            } else if (str.equals("Test")) {
-
-                writeToLog("Testing passwords. You must click the test button until all tests are completed.");
-                emailBtn.setEnabled(false);
-                shopBtn.setEnabled(false);
-                bankBtn.setEnabled(false);
-
-                if (orderOfPassword.size() > 0) {
-                    model.resetNumberOfFailures(); // TODO: figure out if this is needed here.
                     randomizeShapePanel(model.randomizeFileList());
-                    createTestPanel(null);
-                    switch (orderOfPassword.get(0)) {
-                        case 0:
-                            writeToLog("Randomized test - Email password.");
-                            model.setCurrentPassword(model.getEmailPassword());
-                            passwordLabel.setText("Please enter the Email password.");
-                            break; // Email
-                        case 1:
-                            writeToLog("Randomized test - Shopping password.");
-                            model.setCurrentPassword(model.getShoppingPassword());
-                            passwordLabel.setText("Please enter the Shopping password.");
-                            break; // Shopping
-                        case 2:
-                            writeToLog("Randomized test - Banking password.");
-                            model.setCurrentPassword(model.getBankingPassword());
-                            passwordLabel.setText("Please enter the Banking password.");
-                            break; // Banking
-                    }
-                    orderOfPassword.remove(0);
-                    if (orderOfPassword.size() == 0) {
-                        mainControlsPanel.setVisible(false);
-                        writeToLog("All tests completed!");
-                    }
-                }
-            } else if (str.equals("Save")) {
-                saveToFile();
-            } else if (str.equals("Back")) {
-                writeToLog("User has chosen to return to main menu.");
-                testPanel.setVisible(false);
-                mainControlsPanel.setVisible(true);
-                mainScreen.setVisible(true);
-            } else { // Shape must've been clicked
-                if (str.contains(".PNG")) {
-                    str = str.replace(".PNG", "").toLowerCase();
-                    writeToLog(str + " has been selected.");
+                    createTestPanel(strEmailPassword.toString()); // Call the function to display the Test Panel for user input
 
-                    if (!str.equals(model.getNextExpectedShape())) {
-                        model.incNumberOfFailures();
-                        JOptionPane.showMessageDialog(testPanel,"You've selected an invalid shape! You have " + (3 - model.getNumberOfFailures()) + " tries remaining.");
-                        writeToLog("User has entered an invalid shape! Number of failures: " + model.getNumberOfFailures());
-                        if (model.getNumberOfFailures() >= 3) {
-                            writeToLog("User has failed 3 times. Click \"Save Log\" below.");
-                            testPanel.setVisible(false);
+                    model.setCurrentPassword(emailPassword); // Sets the expected Password for user to test input
+
+                    break;
+                case "Shopping":
+                    writeToLog("Shopping password has been created.");
+                    model.setShoppingPassword(); // Create a random shape password
+
+                    String[] shoppingPassword = model.getShoppingPassword(); // Get the created password
+
+                    StringBuilder strShoppingPassword = new StringBuilder(); // Turn the password from an array to a string
+
+                    for (String i : shoppingPassword)
+                        strShoppingPassword.append(i).append(" ");
+
+                    randomizeShapePanel(model.randomizeFileList());
+                    createTestPanel(strShoppingPassword.toString()); // Call the function to display the Test Panel for user input
+
+                    model.setCurrentPassword(shoppingPassword); // Sets the expected Password for user to test input
+
+                    break;
+                case "Banking":
+                    writeToLog("Banking password has been created.");
+                    model.setBankingPassword(); // Create a random shape password
+
+                    String[] bankingPassword = model.getBankingPassword(); // Get the created password
+
+                    StringBuilder strBankingPassword = new StringBuilder(); // Turn the password from an array to a string
+
+                    for (String i : bankingPassword)
+                        strBankingPassword.append(i).append(" ");
+
+                    randomizeShapePanel(model.randomizeFileList());
+                    createTestPanel(strBankingPassword.toString()); // Call the function to display the Test Panel for user input
+                    model.setCurrentPassword(bankingPassword); // Sets the expected Password for user to test input
+                    break;
+                case "Test":
+                    writeToLog("Testing passwords. You must click the test button until all tests are completed.");
+                    emailBtn.setEnabled(false);
+                    shopBtn.setEnabled(false);
+                    bankBtn.setEnabled(false);
+
+                    if (orderOfPassword.size() > 0) {
+                        model.resetNumberOfFailures(); // TODO: figure out if this is needed here.
+                        randomizeShapePanel(model.randomizeFileList());
+                        createTestPanel(null);
+                        switch (orderOfPassword.get(0)) {
+                            case 0:
+                                writeToLog("Randomized test - Email password.");
+                                model.setCurrentPassword(model.getEmailPassword());
+                                passwordLabel.setText("Please enter the Email password.");
+                                break; // Email
+                            case 1:
+                                writeToLog("Randomized test - Shopping password.");
+                                model.setCurrentPassword(model.getShoppingPassword());
+                                passwordLabel.setText("Please enter the Shopping password.");
+                                break; // Shopping
+                            case 2:
+                                writeToLog("Randomized test - Banking password.");
+                                model.setCurrentPassword(model.getBankingPassword());
+                                passwordLabel.setText("Please enter the Banking password.");
+                                break; // Banking
+                        }
+                        orderOfPassword.remove(0);
+                        if (orderOfPassword.size() == 0) {
                             mainControlsPanel.setVisible(false);
-                            mainScreen.setVisible(true);
-                        }
-                    } else {
-                        if (!model.setNextExpectedShape()) {
-                            writeToLog("User has been properly authenticated!");
-                            model.resetNumberOfFailures();
-                            model.incNumOfSuccesses();
-
-                            if (model.getEmailPasswordSet()) {
-                                shopBtn.setEnabled(true);
-                            }
-                            if (model.getShopPasswordSet()) {
-                                bankBtn.setEnabled(true);
-                            }
-                            if (model.getBankPasswordSet()) {
-                                testBtn.setEnabled(true);
-                            }
-
-                            testPanel.setVisible(false);
-                            mainScreen.setVisible(true);
-                            return;
+                            writeToLog("All tests completed!");
                         }
                     }
+                    break;
+                case "Save":
+                    saveToFile();
+                    break;
+                case "Back":
+                    writeToLog("User has chosen to return to main menu.");
+                    testPanel.setVisible(false);
+                    mainControlsPanel.setVisible(true);
+                    mainScreen.setVisible(true);
+                    break;
+                default:  // Shape must've been clicked
+                    if (str.contains(".PNG")) {
+                        str = str.replace(".PNG", "").toLowerCase();
+                        writeToLog(str + " has been selected.");
 
-                    testPanel.remove(passwordPanel);
-                    randomizeShapePanel(model.randomizeFileList());
-                    testPanel.add(passwordPanel, BorderLayout.CENTER);
-                    testPanel.revalidate();
-                }
+                        if (!str.equals(model.getNextExpectedShape())) {
+                            model.incNumberOfFailures();
+                            JOptionPane.showMessageDialog(testPanel, "You've selected an invalid shape! You have " + (3 - model.getNumberOfFailures()) + " tries remaining.");
+                            writeToLog("User has entered an invalid shape! Number of failures: " + model.getNumberOfFailures());
+                            if (model.getNumberOfFailures() >= 3) {
+                                writeToLog("User has failed 3 times. Click \"Save Log\" below.");
+                                testPanel.setVisible(false);
+                                mainControlsPanel.setVisible(false);
+                                mainScreen.setVisible(true);
+                            }
+                        } else {
+                            if (!model.setNextExpectedShape()) {
+                                writeToLog("User has been properly authenticated!");
+                                model.resetNumberOfFailures();
+
+                                if (model.getEmailPasswordSet()) {
+                                    shopBtn.setEnabled(true);
+                                }
+                                if (model.getShopPasswordSet()) {
+                                    bankBtn.setEnabled(true);
+                                }
+                                if (model.getBankPasswordSet()) {
+                                    testBtn.setEnabled(true);
+                                }
+
+                                testPanel.setVisible(false);
+                                mainScreen.setVisible(true);
+                                return;
+                            }
+                        }
+
+                        testPanel.remove(passwordPanel);
+                        randomizeShapePanel(model.randomizeFileList());
+                        testPanel.add(passwordPanel, BorderLayout.CENTER);
+                        testPanel.revalidate();
+                    }
+                    break;
             }
 
         }
